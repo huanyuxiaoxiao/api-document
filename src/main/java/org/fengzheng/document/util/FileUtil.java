@@ -1,14 +1,12 @@
 package org.fengzheng.document.util;
 
 import org.fengzheng.document.bean.ParamMapper;
+import org.fengzheng.document.handle.MakeDocumentDesc;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -106,11 +104,14 @@ public class FileUtil {
             for (String param : params) {
                 String[] p = param.trim().split("\\s+");
                 ParamMapper mapper = new ParamMapper(p);
-                if (checkInclude(mapper)) {
+                if (checkInclude(mapper) && MakeDocumentDesc.makeNormalParams) {
                     paramList.add(mapper);
-                } else {
-                    _logger.warning(String.format("未包含在允许生成接口说明的类型中[%s]", mapper.toString()));
                 }
+                if (Objects.equals(mapper.getParamType(), "header") && MakeDocumentDesc.makeHeaderParams) {
+                    paramList.add(mapper);
+                    continue;
+                }
+                 _logger.warning(String.format("未包含在允许生成接口说明的类型中[%s]", mapper.toString()));
             }
             all.add(paramList);
         }
