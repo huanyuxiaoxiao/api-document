@@ -51,6 +51,8 @@ public class ParamMapper implements Serializable {
             annotation=p[0].toString().replaceAll("\\s+", "").replaceAll("@","");
             if(Objects.equals(annotation,"PathVariable")){
                 paramType="path";
+            }else if(Objects.equals(annotation,"RequestBody")){
+                paramType="body";
             }else{
                 paramType="query";
             }
