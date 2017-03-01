@@ -16,16 +16,15 @@ import java.util.logging.Logger;
  */
 public class MakeDocumentDesc {
     private static final Logger _logger = Logger.getLogger("MakeDocumentDesc");
-    private static final File controllerFolder = new File("/Users/Tibers/software/bwl/bwl-server/src/main/java/com/wangtiansoft/bwl/server/controller");
-    private static final File outputFile = new File("/Users/Tibers/Desktop/bwl");
+    private static final File controllerFolder = new File("/Users/Tibers/software/hwlm-project/hwlm-service/src/main/java/cn/com/hong5/service/rest");
+    private static final File outputFile = new File("/Users/Tibers/Desktop/hwlm");
     private static final Set<String> unMakeFile = new HashSet<String>() {{
-        add("ExceptionController");
-        add("FileController");
+        add("HwlmAdminController");
     }};
-    public static final Boolean makeNormalParams = Boolean.FALSE;//是否对FileUtil.makeTypeSet 中的列表生成响应的注解......swagger可以通过反射生成,不必要显性注解
-    public static final Boolean makeHeaderParams = Boolean.TRUE;//是否生成header请求参数  详情见ParamMapper.toString
+    public static final Boolean makeNormalParams = Boolean.TRUE;//是否对FileUtil.makeTypeSet 中的列表生成响应的注解......swagger可以通过反射生成,不必要显性注解
+    public static final Boolean makeHeaderParams = Boolean.FALSE;//是否生成header请求参数  详情见ParamMapper.toString
     public static final Boolean makeOldFile = Boolean.TRUE;//是否生成旧文件
-    public static final Boolean replaceOldFile = Boolean.TRUE;//是否替换源文件
+    public static final Boolean replaceOldFile = Boolean.FALSE;//是否替换源文件
     public static final String tokenParamType = "TokenModel";
     static List<String> oldFileContent = new ArrayList<>();
     static List<String> documentDesc = new ArrayList<>();
@@ -37,12 +36,16 @@ public class MakeDocumentDesc {
             throw new Exception("controller目录不存在");
         }
         for (File file : controllerFolder.listFiles()) {
+            if(file.isDirectory()){
+                continue;
+            }
             try {
                 buildDocument(file);
                 buildFinishFile(file);
                 oldFileContent.clear();
                 documentDesc.clear();
             } catch (Exception e) {
+                e.printStackTrace();
                 _logger.warning("接口文档生成失败:"+e.getMessage());
             }
         }

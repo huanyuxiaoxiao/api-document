@@ -1,5 +1,6 @@
 package org.fengzheng.document.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.fengzheng.document.bean.ParamMapper;
 import org.fengzheng.document.handle.MakeDocumentDesc;
 
@@ -16,17 +17,11 @@ import java.util.regex.Pattern;
  */
 public class FileUtil {
     private static final Logger _logger = Logger.getLogger("FileUtil");
-    private static final String REQUEST_METHOD_COMPLETE_LINE = "^\\s+public\\s+[a-zA-Z]+\\s+[a-zA-Z]+\\(([a-zA-Z@,<>\\[\\]\\s]*)\\)\\s*(throws\\s+[a-zA-Z]*Exception)*\\s+\\{\\s*$";
-    private static final String REQUEST_METHOD_NOT_COMPLETE_LINE_BEGIN = "^\\s+public\\s+([a-zA-Z]+)\\s+[a-zA-Z]+\\(([a-zA-Z@,<>\\[\\]\\s]*)$";
-    private static final String REQUEST_METHOD_NOT_COMPLETE_LINE_END = "^\\s+[a-zA-Z@,<>\\[\\]\\s]*[)]*\\s+[throws\\s+[a-zA-Z]*Exception]*\\s+\\{\\s*$";
+    private static final String REQUEST_METHOD_COMPLETE_LINE = "^[\\s\\t]*public\\s+[a-zA-Z]+\\s+[a-zA-Z]+\\(([a-zA-Z0-9@,<>\\[\\]\\s_.=\"()]*)\\)\\s*(throws\\s+[a-zA-Z]*Exception)*\\s*\\{\\s*$";
+    private static final String REQUEST_METHOD_NOT_COMPLETE_LINE_BEGIN = "^^[\\s\\t]*\\s+([a-zA-Z]+)\\s+[a-zA-Z]+\\(([a-zA-Z0-9@,<>\\[\\]\\s_.=\"()]*)$";
+    private static final String REQUEST_METHOD_NOT_COMPLETE_LINE_END = "^\\s+[a-zA-Z0-9@,<>\\[\\]\\s_.=\"()]*\\s+[throws\\s+[a-zA-Z]*Exception]*\\s*\\{\\s*$";
     static StringBuffer notComplete = new StringBuffer();
-    static Set<String> makeTypeSet = new HashSet<String>() {{
-        add("String");
-        add("Long");
-        add("int");
-        add("long");
-        add("Integer");
-        add("List");
+    static Set<String> unMake = new HashSet<String>() {{
     }};
     static boolean completeFlag = true;//完整行标记
 
@@ -102,10 +97,15 @@ public class FileUtil {
             }
             String[] params = paramString.split(",");
             for (String param : params) {
-                String[] p = param.trim().split("\\s+");
+                if(StringUtils.isEmpty(param)){
+                    continue;
+                }
+                System.out.println(param);
+                String[] p = param.trim().replaceAll("\\(.*\\)","").split("\\s+");
                 ParamMapper mapper = new ParamMapper(p);
                 if (checkInclude(mapper) && MakeDocumentDesc.makeNormalParams) {
                     paramList.add(mapper);
+                    continue;
                 }
                 if (Objects.equals(mapper.getParamType(), "header") && MakeDocumentDesc.makeHeaderParams) {
                     paramList.add(mapper);
@@ -141,11 +141,11 @@ public class FileUtil {
     }
 
     private static boolean checkInclude(ParamMapper mapper) {
-        for (String s : makeTypeSet) {
+        for (String s : unMake) {
             if (mapper.getOldType().equalsIgnoreCase(s) || mapper.getOldType().startsWith(s)) {
-                return Boolean.TRUE;
+                return Boolean.FALSE;
             }
         }
-        return Boolean.FALSE;
+        return Boolean.TRUE;
     }
 }

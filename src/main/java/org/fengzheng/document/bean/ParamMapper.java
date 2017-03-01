@@ -1,5 +1,6 @@
 package org.fengzheng.document.bean;
 
+import com.alibaba.fastjson.JSON;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -41,25 +42,25 @@ public class ParamMapper implements Serializable {
             if(oldType.equalsIgnoreCase("long")||oldType.equalsIgnoreCase("int")||oldType.equalsIgnoreCase("Integer")){
                 dataType="int";
             }else{
-                dataType="String";
+                dataType=oldType;
             }
             name = p[1].toString().replaceAll("\\s+", "");
 
         } else {
-            int maxPoit = p.length - 1;
+            int maxPoint = p.length - 1;
             annotation=p[0].toString().replaceAll("\\s+", "").replaceAll("@","");
             if(Objects.equals(annotation,"PathVariable")){
                 paramType="path";
             }else{
                 paramType="query";
             }
-            oldType = p[maxPoit - 1].toString().replaceAll("\\s+", "");
+            oldType = p[maxPoint - 1].toString().replaceAll("\\s+", "");
             if(oldType.equalsIgnoreCase("long")||oldType.equalsIgnoreCase("int")||oldType.equalsIgnoreCase("Integer")){
                 dataType="int";
             }else{
-                dataType="String";
+                dataType=oldType;
             }
-            name = p[maxPoit].toString().replaceAll("\\s+", "");
+            name = p[maxPoint].toString().replaceAll("\\s+", "");
         }
         changeParamType();
 
